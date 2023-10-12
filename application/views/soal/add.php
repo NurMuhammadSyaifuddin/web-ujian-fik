@@ -13,7 +13,7 @@
                 <div class="row">
                     <div class="col-sm-8 col-sm-offset-2">
                         <div class="form-group col-sm-12">
-                            <label>Lecturer (Course)</label>
+                            <label>Course</label>
                             <?php if ($this->ion_auth->is_admin()) : ?>
                             <select name="dosen_id" required="required" id="dosen_id" class="select2 form-group" style="width:100% !important">
                                 <option value="" disabled selected>Choose Lecturer</option>
@@ -25,7 +25,8 @@
                             <?php else : ?>
                             <input type="hidden" name="dosen_id" value="<?=$dosen->id_dosen;?>">
                             <input type="hidden" name="matkul_id" value="<?=$dosen->matkul_id;?>">
-                                <select id="matkul_id" class="form-control select2" style="width:100% !important">
+                                <select required="required" name="matkul_id" id="matkul_id" class="form-control select2" style="width:100% !important">
+                                    <option value="" disabled selected>Choose Course</option>
                                     <?php foreach ($matkul as $m) :?>
                                         <option value="<?=$m->id_matkul?>"><?=$m->nama_matkul?></option>
                                     <?php endforeach; ?>

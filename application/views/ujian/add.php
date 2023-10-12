@@ -11,16 +11,22 @@
         <div class="row">
             <div class="col-sm-4">
                 <div class="alert bg-purple">
-                    <h4>Course <i class="fa fa-book pull-right"></i></h4>
-                    <p><?=$matkul->nama_matkul?></p>
-                </div>
-                <div class="alert bg-purple">
                     <h4>Lecturer <i class="fa fa-address-book-o pull-right"></i></h4>
                     <p><?=$dosen->nama_dosen?></p>
                 </div>
             </div>
             <div class="col-sm-4">
-                <?=form_open('ujian/save', array('id'=>'formujian'), array('method'=>'add','dosen_id'=>$dosen->id_dosen, 'matkul_id'=>$matkul->matkul_id))?>
+                <?=form_open('ujian/save', array('id'=>'formujian'), array('method'=>'add','dosen_id'=>$dosen->id_dosen))?>
+                <div class="form-group">
+                    <label for="nama_matkul">Course Name</label>
+                    <select required="required" name="matkul_id" id="matkul_id" class="form-control select2" style="width:100% !important">
+                        <option value="" disabled selected>Choose Course</option>
+                        <?php foreach ($matkul as $m) :?>
+                            <option value="<?=$m->matkul_id?>"><?=$m->nama_matkul?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <small class="help-block"></small>
+                </div>
                 <div class="form-group">
                     <label for="nama_ujian">Exam Name</label>
                     <input autofocus="autofocus" onfocus="this.select()" placeholder="Exam Name" type="text" class="form-control" name="nama_ujian">

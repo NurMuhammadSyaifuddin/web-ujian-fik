@@ -109,7 +109,14 @@ class Soal extends CI_Controller {
 	public function data($id=null)
 	{
         $user = $this->ion_auth->user()->row();
-		$this->output_json($this->soal->getDataSoal($user->username, $id), false);
+        if($this->ion_auth->is_admin()){
+            //Jika admin maka tampilkan semua matkul
+            $this->output_json($this->soal->getDataSoalAdmin($id), false);
+        }elseif ($this->ion_auth->in_group('Lecturer')){
+            //Jika bukan maka matkul dipilih otomatis sesuai matkul dosen
+            $this->output_json($this->soal->getDataSoal($user->username, $id), false);
+        }
+
     }
 
     public function validasi()

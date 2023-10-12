@@ -11,19 +11,15 @@
         <div class="row">
             <div class="col-sm-4">
                 <div class="alert bg-purple">
-                    <h4>Course <i class="fa fa-book pull-right"></i></h4>
-                    <p><?=$matkul->nama_matkul?></p>
-                </div>
-                <div class="alert bg-purple">
                     <h4>Lecturer <i class="fa fa-address-book-o pull-right"></i></h4>
                     <p><?=$dosen->nama_dosen?></p>
                 </div>
             </div>
             <div class="col-sm-4">
-                <?=form_open('ujian/save', array('id'=>'formujian'), array('method'=>'edit','dosen_id'=>$dosen->id_dosen, 'matkul_id'=>$matkul->matkul_id, 'id_ujian'=>$ujian->id_ujian))?>
+                <?=form_open('ujian/save', array('id'=>'formujian'), array('method'=>'edit','dosen_id'=>$dosen->id_dosen, 'id_ujian'=>$ujian->id_ujian))?>
                 <div class="form-group">
                     <label for="nama_ujian">Exam Name</label>
-                    <input value="<?=$ujian->nama_ujian?>" autofocus="autofocus" onfocus="this.select()" placeholder="Nama Ujian" type="text" class="form-control" name="nama_ujian">
+                    <input value="<?=$ujian->nama_ujian?>" autofocus="autofocus"  placeholder="Nama Ujian" type="text" class="form-control" name="nama_ujian">
                     <small class="help-block"></small>
                 </div>
                 <div class="form-group">

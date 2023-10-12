@@ -16,6 +16,18 @@ class Soal_model extends CI_Model {
         return $this->datatables->generate();
     }
 
+    public function getDataSoalAdmin($id)
+    {
+        $this->datatables->select('a.id_soal, a.soal, FROM_UNIXTIME(a.created_on) as created_on, FROM_UNIXTIME(a.updated_on) as updated_on, b.nama_matkul, c.nama_dosen');
+        $this->datatables->from('tb_soal a');
+        $this->datatables->join('matkul b', 'b.id_matkul=a.matkul_id');
+        $this->datatables->join('dosen c', 'c.id_dosen=a.dosen_id');
+        if ($id!==null) {
+            $this->datatables->where('a.matkul_id', $id);
+        }
+        return $this->datatables->generate();
+    }
+
     public function getSoalById($id)
     {
         return $this->db->get_where('tb_soal', ['id_soal' => $id])->row();
@@ -23,10 +35,10 @@ class Soal_model extends CI_Model {
 
     public function getMatkulDosen($nip)
     {
-        $this->db->select('matkul_id, nama_matkul, id_dosen, nama_dosen');
-        $this->db->join('dosen_matkul', 'id_dosen=dosen_id');
-        $this->db->join('matkul', 'matkul_id=id_matkul');
-        $this->db->from('dosen')->where('nip', $nip);
+        $this->db->select('a.matkul_id, b.nama_matkul, c.id_dosen, c.nama_dosen');
+        $this->db->join('dosen_matkul a', 'c.id_dosen=a.dosen_id');
+        $this->db->join('matkul b', 'a.matkul_id=b.id_matkul');
+        $this->db->from('dosen c')->where('c.nip', $nip);
         return $this->db->get()->row();
     }
 
@@ -44,7 +56,8 @@ class Soal_model extends CI_Model {
     {
         $this->db->select('*');
         $this->db->from('dosen a');
-        $this->db->join('matkul b', 'a.matkul_id=b.id_matkul');
+        $this->db->join('dosen_matkul c', 'c.dosen_id=a.id_dosen');
+        $this->db->join('matkul b', 'c.matkul_id=b.id_matkul');
         return $this->db->get()->result();
     }
 }

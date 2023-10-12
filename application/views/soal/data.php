@@ -28,6 +28,7 @@
                         <?php endforeach; ?>
                     </select>
 				<?php endif; ?>
+
 			</div>
 			<div class="col-sm-4">
 				<div class="pull-right">
@@ -91,8 +92,8 @@ $(document).ready(function(){
 	});
 });
 </script>
-
 <?php endif; ?>
+
 <?php if ( $this->ion_auth->in_group('Lecturer') ) : ?>
 <script type="text/javascript">
 $(document).ready(function(){
