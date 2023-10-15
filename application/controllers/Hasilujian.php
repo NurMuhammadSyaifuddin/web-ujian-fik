@@ -54,13 +54,15 @@ class HasilUjian extends CI_Controller {
 	{
 		$ujian = $this->ujian->getUjianById($id);
 		$nilai = $this->ujian->bandingNilai($id);
+		$data = $this->ujian->HslUjianById($this->user->username, true);
 
 		$data = [
 			'user' => $this->user,
 			'judul'	=> 'Exam',
 			'subjudul'=> 'Detail Exam results',
 			'ujian'	=> $ujian,
-			'nilai'	=> $nilai
+			'nilai'	=> $nilai,
+			'data'	=> $data,
 		];
 
 		$this->load->view('_templates/dashboard/_header.php', $data);

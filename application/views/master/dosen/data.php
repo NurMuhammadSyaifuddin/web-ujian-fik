@@ -23,7 +23,6 @@
                     <th>NIP</th>
                     <th>Lecturer Name</th>
                     <th>Email</th>
-                    <th>Course</th>
                     <th class="text-center">Action</th>
                     <th class="text-center">
                         <input type="checkbox" class="select_all">

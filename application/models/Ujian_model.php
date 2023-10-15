@@ -124,7 +124,7 @@ class Ujian_model extends CI_Model {
             $get = "generate";
         }
         
-        $this->$db->select('d.id, a.nama, b.nama_kelas, c.nama_jurusan, d.jml_benar, d.nilai');
+        $this->$db->select('d.id, a.nama, a.nim, b.nama_kelas, c.nama_jurusan, d.jml_benar, d.nilai');
         $this->$db->from('mahasiswa a');
         $this->$db->join('kelas b', 'a.kelas_id=b.id_kelas');
         $this->$db->join('jurusan c', 'b.jurusan_id=c.id_jurusan');

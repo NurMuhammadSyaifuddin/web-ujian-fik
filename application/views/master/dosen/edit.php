@@ -26,16 +26,6 @@
                     <input value="<?=$data->email?>" type="text" class="form-control" name="email" placeholder="Lecturer Email">
                     <small class="help-block"></small>
                 </div>
-                <div class="form-group">
-                    <label for="matkul" >Course</label>
-                    <select name="matkul" id="matkul" class="form-control select2" style="width: 100%!important">
-                        <option value="" disabled selected>Choose Course</option>
-                        <?php foreach ($matkul as $row) : ?>
-                            <option <?=$data->matkul_id===$row->id_matkul?"selected":""?> value="<?=$row->id_matkul?>"><?=$row->nama_matkul?></option>
-                        <?php endforeach; ?>
-                    </select>
-                    <small class="help-block"></small>
-                </div>
                 <div class="form-group pull-right">
                     <button type="reset" class="btn btn-flat btn-danger">
                         <i class="fa fa-rotate-left"></i> Reset

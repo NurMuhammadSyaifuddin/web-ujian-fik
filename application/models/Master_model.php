@@ -174,9 +174,8 @@ class Master_model extends CI_Model
 
     public function getDataDosen()
     {
-        $this->datatables->select('a.id_dosen,a.nip, a.nama_dosen, a.email, a.matkul_id, b.nama_matkul, (SELECT COUNT(id) FROM users WHERE username = a.nip OR email = a.email) AS ada');
+        $this->datatables->select('a.id_dosen, a.nip, a.nama_dosen, a.email, (SELECT COUNT(id) FROM users WHERE username = a.nip OR email = a.email) AS ada');
         $this->datatables->from('dosen a');
-        $this->datatables->join('matkul b', 'a.matkul_id=b.id_matkul');
         return $this->datatables->generate();
     }
 

@@ -74,7 +74,7 @@ class Soal extends CI_Controller {
             $data['dosen'] = $this->soal->getAllDosen();
         }else{
             //Jika bukan maka matkul dipilih otomatis sesuai matkul dosen
-            $data['dosen'] = $this->soal->getMatkulDosen($user->username);
+            $data['dosen'] = $this->soal->getMatkulDosenSoal($user->username);
             $data['matkul'] = $this->soal->getMatkulDosenById($user->username);
         }
 
@@ -98,7 +98,7 @@ class Soal extends CI_Controller {
             $data['dosen'] = $this->soal->getAllDosen();
         }else{
             //Jika bukan maka matkul dipilih otomatis sesuai matkul dosen
-            $data['dosen'] = $this->soal->getMatkulDosen($user->username);
+            $data['dosen'] = $this->soal->getMatkulDosenSoal($user->username);
         }
 
 		$this->load->view('_templates/dashboard/_header.php', $data);

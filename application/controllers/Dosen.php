@@ -59,8 +59,7 @@ class Dosen extends CI_Controller
 			'user' 		=> $this->ion_auth->user()->row(),
 			'judul'		=> 'Edit Lecturer',
 			'subjudul'	=> 'Edit Lecturer Data',
-			'matkul'	=> $this->master->getAllMatkul(),
-			'data' 		=> $this->master->getDosenById($id)
+            'data' => $this->master->getDosenById($id)
 		];
 		$this->load->view('_templates/dashboard/_header.php', $data);
 		$this->load->view('master/dosen/edit');

@@ -36,9 +36,18 @@ class Soal_model extends CI_Model {
     public function getMatkulDosen($nip)
     {
         $this->db->select('a.matkul_id, b.nama_matkul, c.id_dosen, c.nama_dosen');
-        $this->db->join('dosen_matkul a', 'c.id_dosen=a.dosen_id');
+        $this->db->join('dosen c', 'c.id_dosen=a.dosen_id');
         $this->db->join('matkul b', 'a.matkul_id=b.id_matkul');
-        $this->db->from('dosen c')->where('c.nip', $nip);
+        $this->db->from('dosen_matkul a')->where('c.nip', $nip);
+        return $this->db->get()->result();
+    }
+
+    public function getMatkulDosenSoal($nip)
+    {
+        $this->db->select('a.matkul_id, b.nama_matkul, c.id_dosen, c.nama_dosen');
+        $this->db->join('dosen c', 'c.id_dosen=a.dosen_id');
+        $this->db->join('matkul b', 'a.matkul_id=b.id_matkul');
+        $this->db->from('dosen_matkul a')->where('c.nip', $nip);
         return $this->db->get()->row();
     }
 

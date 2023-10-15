@@ -52,12 +52,11 @@ $(document).ready(function() {
       { data: "nip" },
       { data: "nama_dosen" },
       { data: "email" },
-      { data: "nama_matkul" }
     ],
     columnDefs: [
       {
         searchable: false,
-        targets: 5,
+        targets: 4,
         data: {
           id_dosen: "id_dosen",
           ada: "ada"
@@ -80,7 +79,7 @@ $(document).ready(function() {
         }
       },
       {
-        targets: 6,
+        targets: 5,
         data: "id_dosen",
         render: function(data, type, row, meta) {
           return `<div class="text-center">

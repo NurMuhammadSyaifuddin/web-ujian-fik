@@ -68,8 +68,8 @@ class Auth extends CI_Controller
 					'failed' => 'Incorrect Login',
 				];
 				$this->output_json($data);
-				redirect('dashboard','refresh');
 			}
+            redirect('dashboard','refresh');
 		}else{
 			$invalid = [
 				'identity' => form_error('identity'),

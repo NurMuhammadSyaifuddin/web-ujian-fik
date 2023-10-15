@@ -73,11 +73,12 @@
             <tr>
                 <th>#</th>
                 <th>Name</th>
+                <th>NIM</th>
                 <th>Class</th>
                 <th>Dept.</th>
                 <th>Correct Ans.</th>
                 <th>Score</th>
-            </tr>        
+            </tr>
         </thead>
         <!-- <tfoot>
             <tr>

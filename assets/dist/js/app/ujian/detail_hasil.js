@@ -19,7 +19,7 @@ $(document).ready(function () {
         processing: true,
         serverSide: true,
         ajax: {
-            "url": base_url + "hasilujian/NilaiMhs/"+id,
+            "url": base_url + "Hasilujian/NilaiMhs/"+id,
             "type": "POST",
         },
         columns: [
@@ -29,6 +29,7 @@ $(document).ready(function () {
                 "searchable": false
             },
             { "data": 'nama' },
+            { "data": 'nim' },
             { "data": 'nama_kelas' },
             { "data": 'nama_jurusan' },
             { "data": 'jml_benar' },

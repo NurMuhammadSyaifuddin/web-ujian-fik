@@ -49,6 +49,7 @@ $(document).ready(function(){
 			confirmButtonText: 'Yeah, Logout!'
 		}).then((result) => {
 			if(result.value){
+				window.history.pushState(null, null, base_url+"logout");
 				location.href=base_url+"logout";
 			}
 		});
