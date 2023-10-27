@@ -2,7 +2,7 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Ujian_model extends CI_Model {
-    
+
     public function getDataUjian($id)
     {
         $this->datatables->select('a.id_ujian, a.token, a.nama_ujian, b.nama_matkul, a.jumlah_soal, CONCAT(a.tgl_mulai, " <br/> (", a.waktu, " Minute)") as waktu, a.jenis');
@@ -99,6 +99,24 @@ class Ujian_model extends CI_Model {
         return $this->db->get()->row()->list_jawaban;
     }
 
+    public function getRealJawaban($dosen_id, $matkul_id)
+    {
+        $this->db->select('jawaban');
+        $this->db->from('tb_soal');
+        $this->db->where('dosen_id', $dosen_id);
+        $this->db->where('matkul_id', $matkul_id);
+        return $this->db->get()->row()->jawaban;
+    }
+
+    public function getAllJawaban($id_tes)
+    {
+        $this->db->select('list_jawaban');
+        $this->db->from('h_ujian');
+        $this->db->where('id', $id_tes);
+        return $this->db->get()->result();
+    }
+
+
     public function getHasilUjian($nip = null)
     {
         $this->datatables->select('b.id_ujian, b.nama_ujian, b.jumlah_soal, CONCAT(b.waktu, " Minute") as waktu, b.tgl_mulai');
@@ -133,6 +151,7 @@ class Ujian_model extends CI_Model {
         return $this->$db->$get();
     }
 
+
     public function bandingNilai($id)
     {
         $this->db->select_min('nilai', 'min_nilai');
@@ -140,6 +159,58 @@ class Ujian_model extends CI_Model {
         $this->db->select_avg('FORMAT(FLOOR(nilai),0)', 'avg_nilai');
         $this->db->where('ujian_id', $id);
         return $this->db->get('h_ujian')->row();
+    }
+
+    public function getPesertaKelas($id, $limit, $order, $jml_soal, $dt = false)
+    {
+        if ($dt === false) {
+            $db = "db";
+            $get = "get";
+        } else {
+            $db = "datatables";
+            $get = "generate";
+        }
+
+        $this->$db->select('d.id, a.nama, a.nim, b.nama_kelas, c.nama_jurusan, d.list_jawaban, d.jml_benar, d.nilai');
+        $this->$db->from('mahasiswa a');
+        $this->$db->join('kelas b', 'a.kelas_id = b.id_kelas');
+        $this->$db->join('jurusan c', 'b.jurusan_id = c.id_jurusan');
+        $this->$db->join('h_ujian d', 'a.id_mahasiswa = d.mahasiswa_id');
+        $this->$db->where(['d.ujian_id' => $id]);
+
+        // Menetapkan urutan descending berdasarkan kolom 'jml_benar'
+        $this->$db->order_by('d.jml_benar', 'desc');
+
+         if ($order == 'bawah' && $limit == 1){
+             if ($jml_soal == 3){
+                 $this->$db->limit($limit, 2);
+             }else if ($jml_soal == 2){
+                 $this->$db->limit($limit, 1);
+             }else {
+                 $this->$db->limit($limit);
+             }
+
+        }else if ($order == 'bawah') {
+
+             if ($jml_soal % 2 == 0){
+                 // Menghitung offset untuk mengambil 10 data terbawah
+                 $offset = max(0, $limit);
+
+                 // Tambahkan limit untuk mengambil 10 data terbawah
+                 $this->$db->limit($limit, $offset);
+             }else {
+                 $offset = max(0, +1);
+
+                 // Tambahkan limit untuk mengambil 10 data terbawah
+                 $this->$db->limit($limit, $offset);
+             }
+
+
+        }else {
+            $this->$db->limit($limit);
+        }
+
+        return $this->$db->$get()->result();
     }
 
 }

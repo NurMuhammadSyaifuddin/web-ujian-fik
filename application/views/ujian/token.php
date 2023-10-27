@@ -38,7 +38,6 @@
                     <tr>
                         <th>Late</th>
                         <td>
-                            <?=strftime('%d %B %Y', strtotime($ujian->terlambat))?> 
                             <?=date('H:i:s', strtotime($ujian->terlambat))?>
                         </td>
                     </tr>

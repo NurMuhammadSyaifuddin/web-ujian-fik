@@ -907,14 +907,16 @@ class CI_Encryption {
 	 * @param	string	$str
 	 * @return	int
 	 */
-	protected static function strlen($str)
-	{
-		return (self::$func_overload)
-			? mb_strlen($str, '8bit')
-			: strlen($str);
-	}
+    protected static function strlen($str)
+    {
+        $str = $str ?? ''; // Jika $str null, beri nilai string kosong
+        return (self::$func_overload)
+            ? mb_strlen($str, '8bit')
+            : strlen($str);
+    }
 
-	// --------------------------------------------------------------------
+
+    // --------------------------------------------------------------------
 
 	/**
 	 * Byte-safe substr()

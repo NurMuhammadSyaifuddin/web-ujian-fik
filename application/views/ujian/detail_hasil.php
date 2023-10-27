@@ -16,6 +16,13 @@
                         <i class="fa fa-download"></i> Download/Print
                     </a>
                 </div>
+
+                <div class="pull-right">
+                    <a target="_blank" style="margin-right: 10px;" href="<?=base_url()?>hasilujian/cetak_analisis/<?=$this->uri->segment(3)?>" class="btn bg-blue btn-flat btn-sm">
+                        <i class="fa fa-file-text"></i> Analisis Ujian
+                    </a>
+                </div>
+
             </div>
             <div class="col-sm-6">
                 <table class="table w-100">
