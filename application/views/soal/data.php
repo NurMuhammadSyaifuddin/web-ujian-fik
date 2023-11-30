@@ -54,19 +54,6 @@
 				<th class="text-center">Action</th>
             </tr>        
         </thead>
-        <!-- <tfoot>
-            <tr>
-				<th class="text-center">
-					<input type="checkbox" class="select_all">
-				</th>
-                <th width="25">#</th>
-				<th>Lecturer</th>
-                <th>Course</th>
-				<th>Question</th>
-				<th>Created Date</th>
-				<th class="text-center">Action</th>
-            </tr>
-        </tfoot> -->
         </table>
     </div>
 	<?=form_close();?>

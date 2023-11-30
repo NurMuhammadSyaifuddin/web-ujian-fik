@@ -5,6 +5,7 @@ class Ujian extends CI_Controller {
 
 	public $mhs, $user;
 
+public $selectedQuestions = [];
 	public function __construct(){
 		parent::__construct();
 		if (!$this->ion_auth->logged_in()){
@@ -63,7 +64,7 @@ class Ujian extends CI_Controller {
 		$this->load->view('_templates/dashboard/_footer.php');
 	}
 
-	public function add()
+	public function add($id=null)
 	{
 		$this->akses_dosen();
 		
@@ -73,9 +74,12 @@ class Ujian extends CI_Controller {
 			'user' 		=> $user,
 			'judul'		=> 'Exam',
 			'subjudul'	=> 'Add Exam',
-			'matkul'	=> $this->soal->getMatkulDosen($user->username),
+			'matkul'	=> $this->soal->getMatkulDosenById($user->username),
 			'dosen'		=> $this->ujian->getIdDosen($user->username),
+            'soal' => $this->soal->getDataSoalUjian
+             ($user->username, $id)
 		];
+
 
 		$this->load->view('_templates/dashboard/_header.php', $data);
 		$this->load->view('ujian/add');
@@ -127,6 +131,10 @@ class Ujian extends CI_Controller {
 
 	public function save()
 	{
+
+        $this->selectedQuestions = json_decode(htmlspecialchars_decode($this->input->post('selectedQuestions'), true));
+
+
 		$this->validasi();
 		$this->load->helper('string');
 
@@ -266,9 +274,9 @@ class Ujian extends CI_Controller {
 		$this->akses_mahasiswa();
 		$key = $this->input->get('key', true);
 		$id  = $this->encryption->decrypt(rawurldecode($key));
-		
+
 		$ujian 		= $this->ujian->getUjianById($id);
-		$soal 		= $this->ujian->getSoal($id);
+		$soal 		= $this->ujian->getSoal($id, $this->selectedQuestions);
 		
 		$mhs		= $this->mhs;
 		$h_ujian 	= $this->ujian->HslUjian($id, $mhs->id_mahasiswa);
@@ -350,33 +358,40 @@ class Ujian extends CI_Controller {
 			$arr_jawab[$idx] = array("j"=>$val,"r"=>$rg);
 		}
 
-		$arr_opsi = array("a","b","c","d","e");
-		$html = '';
-		$no = 1;
-		if (!empty($soal_urut_ok)) {
-			foreach ($soal_urut_ok as $s) {
-				$path = 'uploads/bank_soal/';
-				$vrg = $arr_jawab[$s->id_soal]["r"] == "" ? "N" : $arr_jawab[$s->id_soal]["r"];
-				$html .= '<input type="hidden" name="id_soal_'.$no.'" value="'.$s->id_soal.'">';
-				$html .= '<input type="hidden" name="rg_'.$no.'" id="rg_'.$no.'" value="'.$vrg.'">';
-				$html .= '<div class="step" id="widget_'.$no.'">';
+        $arr_opsi = array("a", "b", "c", "d", "e");
+        $html = '';
+        $no = 1;
+        if (!empty($soal_urut_ok)) {
+            foreach ($soal_urut_ok as $s) {
+                $path = 'uploads/bank_soal/';
+                $vrg = isset($s->id_soal) && isset($arr_jawab[$s->id_soal]["r"]) ? $arr_jawab[$s->id_soal]["r"] : "N";
+                $html .= '<input type="hidden" name="id_soal_' . $no . '" value="' . (isset($s->id_soal) ? $s->id_soal : '') . '">';
+                $html .= '<input type="hidden" name="rg_' . $no . '" id="rg_' . $no . '" value="' . $vrg . '">';
+                $html .= '<div class="step" id="widget_' . $no . '">';
 
-				$html .= '<div class="text-center"><div class="w-25">'.tampil_media($path.$s->file).'</div></div>'.$s->soal.'<div class="funkyradio">';
-				for ($j = 0; $j < $this->config->item('jml_opsi'); $j++) {
-					$opsi 			= "opsi_".$arr_opsi[$j];
-					$file 			= "file_".$arr_opsi[$j];
-					$checked 		= $arr_jawab[$s->id_soal]["j"] == strtoupper($arr_opsi[$j]) ? "checked" : "";
-					$pilihan_opsi 	= !empty($s->$opsi) ? $s->$opsi : "";
-					$tampil_media_opsi = (is_file(base_url().$path.$s->$file) || $s->$file != "") ? tampil_media($path.$s->$file) : "";
-					$html .= '<div class="funkyradio-success" onclick="return simpan_sementara();">
-						<input type="radio" id="opsi_'.strtolower($arr_opsi[$j]).'_'.$s->id_soal.'" name="opsi_'.$no.'" value="'.strtoupper($arr_opsi[$j]).'" '.$checked.'> <label for="opsi_'.strtolower($arr_opsi[$j]).'_'.$s->id_soal.'"><div class="huruf_opsi">'.$arr_opsi[$j].'</div> <p>'.$pilihan_opsi.'</p><div class="w-25">'.$tampil_media_opsi.'</div></label></div>';
-				}
-				$html .= '</div></div>';
-				$no++;
-			}
-		}
+                $html .= '<div class="text-center"><div class="w-25">' . tampil_media($path . (isset($s->file) ? $s->file : '')) . '</div></div>' . (isset($s->soal) ? $s->soal : '') . '<div class="funkyradio">';
+                for ($j = 0; $j < $this->config->item('jml_opsi'); $j++) {
+                    $opsi = "opsi_" . $arr_opsi[$j];
+                    $file = "file_" . $arr_opsi[$j];
+                    $checked = '';
+                    if(isset($s) && isset($s->id_soal) && isset($arr_jawab[$s->id_soal]["j"]) && strtoupper($arr_jawab[$s->id_soal]["j"]) == strtoupper($arr_opsi[$j])) {
+                        $checked = 'checked';
+                    }
+                    $pilihan_opsi = !empty($s->$opsi) ? $s->$opsi : "";
+                    $tampil_media_opsi = (is_file(base_url() . $path . (isset($s->$file) ? $s->$file : '')) || (isset($s->$file) && $s->$file != "")) ? tampil_media($path . (isset($s->$file) ? $s->$file : '')) : "";
+                    $html .= '<div class="funkyradio-success" onclick="return simpan_sementara();">
+                <input type="radio" id="opsi_' . strtolower($arr_opsi[$j]) . '_' . (isset($s->id_soal) ? $s->id_soal : '') . '" name="opsi_' . $no . '" value="' . strtoupper($arr_opsi[$j]) . '" ' . $checked . '> <label for="opsi_' . strtolower($arr_opsi[$j]) . '_' . (isset($s->id_soal) ? $s->id_soal : '') . '"><div class="huruf_opsi">' . $arr_opsi[$j] . '</div> <p>' . $pilihan_opsi . '</p><div class="w-25">' . $tampil_media_opsi . '</div></label></div>';
+                }
+                $html .= '</div></div>';
+                $no++;
+            }
+        }
 
-		// Enkripsi Id Tes
+// Rest of the code remains unchanged
+
+
+
+        // Enkripsi Id Tes
 		$id_tes = $this->encryption->encrypt($detail_tes->id);
 
 		$data = [
@@ -463,4 +478,6 @@ class Ujian extends CI_Controller {
 		$this->master->update('h_ujian', $d_update, 'id', $id_tes);
 		$this->output_json(['status'=>TRUE, 'data'=>$d_update, 'id'=>$id_tes]);
 	}
+
+
 }

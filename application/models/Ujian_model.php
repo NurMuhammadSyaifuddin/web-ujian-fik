@@ -26,7 +26,7 @@ class Ujian_model extends CI_Model {
         return $this->datatables->generate();
     }
 
-    public function getUjianById($id)
+    public function  getUjianById($id)
     {
         $this->db->select('*');
         $this->db->from('m_ujian a');
@@ -69,7 +69,7 @@ class Ujian_model extends CI_Model {
         return $this->db->get();
     }
 
-    public function getSoal($id)
+    public function getSoal($id, $selectedQuestions)
     {
         $ujian = $this->getUjianById($id);
         $order = $ujian->jenis==="Random" ? 'rand()' : 'id_soal';
@@ -78,7 +78,17 @@ class Ujian_model extends CI_Model {
         $this->db->from('tb_soal');
         $this->db->where('dosen_id', $ujian->dosen_id);
         $this->db->where('matkul_id', $ujian->matkul_id);
-        $this->db->order_by($order);
+        if ($ujian->jenis === "Sort" && !empty($selectedQuestions)) {
+            // Include selected questions in the result
+
+            $this->db->where_in('id_soal', $selectedQuestions);
+        }else{
+            $this->db->order_by($order);
+        }
+
+        $selectedQuestionsString = implode(', ', $selectedQuestions);
+        log_message('error', $selectedQuestionsString);
+
         $this->db->limit($ujian->jumlah_soal);
         return $this->db->get()->result();
     }

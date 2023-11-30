@@ -4,10 +4,10 @@ var table;
 $(document).ready(function() {
   ajaxcsrf();
 
-  table = $("#soal").DataTable({
+  table = $("#soal_ujian").DataTable({
     initComplete: function() {
       var api = this.api();
-      $("#soal_filter input")
+      $("#soal_ujian_filter input")
         .off(".DT")
         .on("keyup.DT", function(e) {
           api.search(this.value).draw();
@@ -17,31 +17,13 @@ $(document).ready(function() {
       "<'row'<'col-sm-3'l><'col-sm-6 text-center'B><'col-sm-3'f>>" +
       "<'row'<'col-sm-12'tr>>" +
       "<'row'<'col-sm-5'i><'col-sm-7'p>>",
-    buttons: [
-      {
-        extend: "copy",
-        exportOptions: { columns: [2, 3, 4, 5] }
-      },
-      {
-        extend: "print",
-        exportOptions: { columns: [2, 3, 4, 5] }
-      },
-      {
-        extend: "excel",
-        exportOptions: { columns: [2, 3, 4, 5] }
-      },
-      {
-        extend: "pdf",
-        exportOptions: { columns: [2, 3, 4, 5] }
-      }
-    ],
     oLanguage: {
       sProcessing: "loading..."
     },
     processing: true,
     serverSide: true,
     ajax: {
-      url: base_url + "soal/data",
+      url: base_url + "soal/data_ujian",
       type: "POST"
     },
     columns: [
@@ -50,15 +32,7 @@ $(document).ready(function() {
         orderable: false,
         searchable: false
       },
-      {
-        data: "id_soal",
-        orderable: false,
-        searchable: false
-      },
-      { data: "nama_dosen" },
-      { data: "nama_matkul" },
       { data: "soal" },
-      { data: "created_on" }
     ],
     columnDefs: [
       {
@@ -70,22 +44,8 @@ $(document).ready(function() {
 								</div>`;
         }
       },
-      {
-        targets: 6,
-        data: "id_soal",
-        render: function(data, type, row, meta) {
-          return `<div class="text-center">
-                                <a href="${base_url}soal/detail/${data}" class="btn btn-xs btn-success">
-                                    <i class="fa fa-eye"></i> Detail
-                                </a>
-                                <a href="${base_url}soal/edit/${data}" class="btn btn-xs btn-warning">
-                                    <i class="fa fa-edit"></i> Edit
-                                </a>
-                            </div>`;
-        }
-      }
+
     ],
-    order: [[5, "desc"]],
     rowId: function(a) {
       return a;
     },
@@ -101,7 +61,7 @@ $(document).ready(function() {
   table
     .buttons()
     .container()
-    .appendTo("#soal_wrapper .col-md-6:eq(0)");
+    .appendTo("#soal_ujian_wrapper .col-md-6:eq(0)");
 
   $(".select_all").on("click", function() {
     if (this.checked) {
@@ -117,9 +77,9 @@ $(document).ready(function() {
     }
   });
 
-  $("#soal tbody").on("click", "tr .check", function() {
-    var check = $("#soal tbody tr .check").length;
-    var checked = $("#soal tbody tr .check:checked").length;
+  $("#soal_ujian tbody").on("click", "tr .check", function() {
+    var check = $("#soal_ujian tbody tr .check").length;
+    var checked = $("#soal_ujian tbody tr .check:checked").length;
     if (check === checked) {
       $(".select_all").prop("checked", true);
     } else {
@@ -163,7 +123,7 @@ $(document).ready(function() {
 });
 
 function bulk_delete() {
-  if ($("#soal tbody tr .check:checked").length == 0) {
+  if ($("#soal_ujian tbody tr .check:checked").length == 0) {
     Swal({
       title: "Failed",
       text: "No data selected",

@@ -25,7 +25,7 @@ setlocale(LC_ALL, 'US');
 | a PHP script and you can easily do that on your own.
 |
 */
-$config['log_threshold'] = 4;
+$config['log_threshold'] = 1;
 $config['base_url'] = "http://".$_SERVER['HTTP_HOST'];
 $config['base_url'] .= preg_replace('@/+$@','',dirname($_SERVER['SCRIPT_NAME'])).'/';
 /*
