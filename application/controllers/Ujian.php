@@ -76,17 +76,16 @@ public $selectedQuestions = [];
 			'subjudul'	=> 'Add Exam',
 			'matkul'	=> $this->soal->getMatkulDosenById($user->username),
 			'dosen'		=> $this->ujian->getIdDosen($user->username),
-            'soal' => $this->soal->getDataSoalUjian
-             ($user->username, $id)
+            'soal'      => $this->soal->getDataSoalUjian($user->username, $id)
 		];
-
+        log_message('debug', $user->username);
 
 		$this->load->view('_templates/dashboard/_header.php', $data);
 		$this->load->view('ujian/add');
 		$this->load->view('_templates/dashboard/_footer.php');
 	}
 	
-	public function edit($id)
+	public function edit($id=null)
 	{
 		$this->akses_dosen();
 		
@@ -99,7 +98,10 @@ public $selectedQuestions = [];
 			'matkul'	=> $this->soal->getMatkulDosen($user->username),
 			'dosen'		=> $this->ujian->getIdDosen($user->username),
 			'ujian'		=> $this->ujian->getUjianById($id),
+            'soal'      => $this->soal->getDataSoalUjian($user->username, $id),
+            'id_soal_ujian'  => $this->ujian->getIdSoalUjian($id)
 		];
+
 
 		$this->load->view('_templates/dashboard/_header.php', $data);
 		$this->load->view('ujian/edit');
@@ -129,58 +131,100 @@ public $selectedQuestions = [];
 		$this->form_validation->set_rules('jenis', 'Random Question', 'required|in_list[Random,Sort]');
 	}
 
-	public function save()
-	{
+    public function save()
+    {
+        $this->load->helper('string');
 
-        $this->selectedQuestions = json_decode(htmlspecialchars_decode($this->input->post('selectedQuestions'), true));
+        $selectedQuestions = json_decode($this->input->post('selectedQuestions'));
+
+        $allSoalUjianData = []; // Array to store all $soalUjianData
+        $key = strtoupper(random_string('alnum', 8));
+        foreach ( $selectedQuestions as $selectedQuestion) {
+            $soalUjianData = [
+                'id_soal_ujian' => $key,
+                'id_soal' => $selectedQuestion, // Using ID directly from $selectedQuestion
+            ];
+
+            // Tambahkan $soalUjianData ke dalam $allSoalUjianData
+            $allSoalUjianData[] = $soalUjianData;
+        }
+
+        log_message('debug', json_encode($selectedQuestions));
+
+        $this->validasi();
+        $this->load->helper('string');
+
+        $method         = $this->input->post('method', true);
+        $dosen_id       = $this->input->post('dosen_id', true);
+        $matkul_id      = $this->input->post('matkul_id', true);
+        $nama_ujian     = $this->input->post('nama_ujian', true);
+        $jumlah_soal    = $this->input->post('jumlah_soal', true);
+        $tgl_mulai      = $this->convert_tgl($this->input->post('tgl_mulai',  true));
+        $tgl_selesai    = $this->convert_tgl($this->input->post('tgl_selesai', true));
+        $waktu          = $this->input->post('waktu', true);
+        $jenis          = $this->input->post('jenis', true);
+        $token          = strtoupper(random_string('alpha', 5));
+        $soal_ujian_id  = $key;
+
+        if ($this->form_validation->run() === FALSE) {
+            $data['status'] = false;
+            $data['errors'] = [
+                'nama_ujian'    => form_error('nama_ujian'),
+                'jumlah_soal'   => form_error('jumlah_soal'),
+                'tgl_mulai'     => form_error('tgl_mulai'),
+                'tgl_selesai'   => form_error('tgl_selesai'),
+                'waktu'         => form_error('waktu'),
+                'jenis'         => form_error('jenis'),
+            ];
+        } else {
+            $input = [
+                'nama_ujian'    => $nama_ujian,
+                'jumlah_soal'   => $jumlah_soal,
+                'tgl_mulai'     => $tgl_mulai,
+                'terlambat'     => $tgl_selesai,
+                'waktu'         => $waktu,
+                'jenis'         => $jenis,
+                'soal_ujian_id' => $soal_ujian_id
+            ];
+            if ($method === 'add') {
+                $input['dosen_id']  = $dosen_id;
+                $input['matkul_id'] = $matkul_id;
+                $input['token']     = $token;
+
+                foreach ($allSoalUjianData as $soalUjianData){
+                    $this->master->create('soal_ujian', $soalUjianData);
+                }
+
+                $action = $this->master->create('m_ujian', $input);
 
 
-		$this->validasi();
-		$this->load->helper('string');
+            } else if ($method === 'edit') {
+                foreach ($allSoalUjianData as $soalUjianData){
+                    $this->master->create('soal_ujian', $soalUjianData);
+                }
 
-		$method 		= $this->input->post('method', true);
-		$dosen_id 		= $this->input->post('dosen_id', true);
-		$matkul_id 		= $this->input->post('matkul_id', true);
-		$nama_ujian 	= $this->input->post('nama_ujian', true);
-		$jumlah_soal 	= $this->input->post('jumlah_soal', true);
-		$tgl_mulai 		= $this->convert_tgl($this->input->post('tgl_mulai', 	true));
-		$tgl_selesai	= $this->convert_tgl($this->input->post('tgl_selesai', true));
-		$waktu			= $this->input->post('waktu', true);
-		$jenis			= $this->input->post('jenis', true);
-		$token 			= strtoupper(random_string('alpha', 5));
+                $action = $this->master->create('m_ujian', $input);
+            }
+            $data['status'] = $action;
+        }
+        $this->output_json($data);
+    }
 
-		if( $this->form_validation->run() === FALSE ){
-			$data['status'] = false;
-			$data['errors'] = [
-				'nama_ujian' 	=> form_error('nama_ujian'),
-				'jumlah_soal' 	=> form_error('jumlah_soal'),
-				'tgl_mulai' 	=> form_error('tgl_mulai'),
-				'tgl_selesai' 	=> form_error('tgl_selesai'),
-				'waktu' 		=> form_error('waktu'),
-				'jenis' 		=> form_error('jenis'),
-			];
-		}else{
-			$input = [
-				'nama_ujian' 	=> $nama_ujian,
-				'jumlah_soal' 	=> $jumlah_soal,
-				'tgl_mulai' 	=> $tgl_mulai,
-				'terlambat' 	=> $tgl_selesai,
-				'waktu' 		=> $waktu,
-				'jenis' 		=> $jenis,
-			];
-			if($method === 'add'){
-				$input['dosen_id']	= $dosen_id;
-				$input['matkul_id'] = $matkul_id;
-				$input['token']		= $token;
-				$action = $this->master->create('m_ujian', $input);
-			}else if($method === 'edit'){
-				$id_ujian = $this->input->post('id_ujian', true);
-				$action = $this->master->update('m_ujian', $input, 'id_ujian', $id_ujian);
-			}
-			$data['status'] = $action ? TRUE : FALSE;
-		}
-		$this->output_json($data);
-	}
+    private function saveSoalUjian($input, $id_ujian = null)
+    {
+        $randomString = strtoupper(random_string('alpha', 6));
+
+        foreach ($this->selectedQuestions as $selectedQuestion) {
+            $soalUjianData = array(
+                'soal_ujian_id' => $randomString,
+                'id_soal'       => $selectedQuestion, // Menggunakan ID langsung dari $selectedQuestion
+                // Tambahan field lain yang perlu disimpan
+            );
+
+            // Simpan data ke dalam tabel soal_ujian
+            $this->master->create('soal_ujian', $soalUjianData);
+        }
+    }
 
 	public function delete()
 	{
@@ -378,7 +422,7 @@ public $selectedQuestions = [];
                         $checked = 'checked';
                     }
                     $pilihan_opsi = !empty($s->$opsi) ? $s->$opsi : "";
-                    $tampil_media_opsi = (is_file(base_url() . $path . (isset($s->$file) ? $s->$file : '')) || (isset($s->$file) && $s->$file != "")) ? tampil_media($path . (isset($s->$file) ? $s->$file : '')) : "";
+                    $tampil_media_opsi = (is_file(base_url() . $path . (isset($s->$file) ? $s->$file  : '')) || (isset($s->$file) && $s->$file != "")) ? tampil_media($path . (isset($s->$file) ? $s->$file : '')) : "";
                     $html .= '<div class="funkyradio-success" onclick="return simpan_sementara();">
                 <input type="radio" id="opsi_' . strtolower($arr_opsi[$j]) . '_' . (isset($s->id_soal) ? $s->id_soal : '') . '" name="opsi_' . $no . '" value="' . strtoupper($arr_opsi[$j]) . '" ' . $checked . '> <label for="opsi_' . strtolower($arr_opsi[$j]) . '_' . (isset($s->id_soal) ? $s->id_soal : '') . '"><div class="huruf_opsi">' . $arr_opsi[$j] . '</div> <p>' . $pilihan_opsi . '</p><div class="w-25">' . $tampil_media_opsi . '</div></label></div>';
                 }

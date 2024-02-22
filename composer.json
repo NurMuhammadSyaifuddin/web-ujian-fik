@@ -12,11 +12,10 @@
     },
     "require": {
         "php": ">=7.0",
-      "ext-json": "*"
+      "ext-json": "*",
+        "seunmatt/codeigniter-log-viewer": "^2.0"
     },
     "suggest": {
         "paragonie/random_compat": "Provides better randomness in PHP 5.x"
-    },
-    "require-dev": {
     }
 }

@@ -3,10 +3,7 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/vendor/composer" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/markbaker/complex" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/markbaker/matrix" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/phpoffice/phpspreadsheet" />
-      <excludeFolder url="file://$MODULE_DIR$/vendor/psr/simple-cache" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/seunmatt/codeigniter-log-viewer" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

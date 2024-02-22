@@ -26,7 +26,7 @@ class Ujian_model extends CI_Model {
         return $this->datatables->generate();
     }
 
-    public function  getUjianById($id)
+    public function getUjianById($id)
     {
         $this->db->select('*');
         $this->db->from('m_ujian a');
@@ -34,6 +34,14 @@ class Ujian_model extends CI_Model {
         $this->db->join('matkul c', 'a.matkul_id=c.id_matkul');
         $this->db->where('id_ujian', $id);
         return $this->db->get()->row();
+    }
+
+    public function getIdSoalUjian($id){
+        $idSoalByUjian = $this->getUjianById($id);
+        $this->db->select('a. id_soal');
+        $this->db->from('soal_ujian a');
+        $this->db->where('a.id_soal_ujian', $idSoalByUjian->soal_ujian_id);
+        return $this->db->get();
     }
 
     public function getIdDosen($nip)
@@ -69,29 +77,56 @@ class Ujian_model extends CI_Model {
         return $this->db->get();
     }
 
-    public function getSoal($id, $selectedQuestions)
+    public function getSoal($id)
     {
         $ujian = $this->getUjianById($id);
-        $order = $ujian->jenis==="Random" ? 'rand()' : 'id_soal';
+        $order = $ujian->jenis === "Random" ? 'rand()' : 'tb_soal.id_soal';
 
-        $this->db->select('id_soal, soal, file, tipe_file, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, jawaban');
+        $this->db->select('tb_soal.id_soal, tb_soal.soal, tb_soal.file, tb_soal.tipe_file, tb_soal.opsi_a, tb_soal.opsi_b, tb_soal.opsi_c, tb_soal.opsi_d, tb_soal.opsi_e, tb_soal.jawaban, tb_soal.matkul_id');
         $this->db->from('tb_soal');
-        $this->db->where('dosen_id', $ujian->dosen_id);
-        $this->db->where('matkul_id', $ujian->matkul_id);
-        if ($ujian->jenis === "Sort" && !empty($selectedQuestions)) {
-            // Include selected questions in the result
+        $this->db->join('soal_ujian', 'tb_soal.id_soal = soal_ujian.id_soal');
+        $this->db->join('m_ujian', 'soal_ujian.id_soal_ujian = m_ujian.soal_ujian_id');
+        $this->db->where('m_ujian.dosen_id', $ujian->dosen_id);
+        $this->db->where('m_ujian.matkul_id', $ujian->matkul_id);
 
-            $this->db->where_in('id_soal', $selectedQuestions);
-        }else{
+        if ($ujian->jenis === "Sort") {
+            // Include selected questions in the result based on soal_ujian
+            $this->db->join('soal_ujian su', 'tb_soal.id_soal = su.id_soal');
+            $this->db->order_by('su.id_soal_ujian');
+        } else {
             $this->db->order_by($order);
         }
-
-        $selectedQuestionsString = implode(', ', $selectedQuestions);
-        log_message('error', $selectedQuestionsString);
 
         $this->db->limit($ujian->jumlah_soal);
         return $this->db->get()->result();
     }
+
+
+
+
+//    public function getSoal($id, $selectedQuestions)
+//    {
+//        $ujian = $this->getUjianById($id);
+//        $order = $ujian->jenis==="Random" ? 'rand()' : 'id_soal';
+//
+//        $this->db->select('id_soal, soal, file, tipe_file, opsi_a, opsi_b, opsi_c, opsi_d, opsi_e, jawaban', 'matkul_id');
+//        $this->db->from('tb_soal');
+//        $this->db->where('dosen_id', $ujian->dosen_id);
+//        $this->db->where('matkul_id', $ujian->matkul_id);
+//        if ($ujian->jenis === "Sort" && !empty($selectedQuestions)) {
+//            // Include selected questions in the result
+//
+//            $this->db->where_in('id_soal', $selectedQuestions);
+//        }else{
+//            $this->db->order_by($order);
+//        }
+//
+//        $selectedQuestionsString = implode(', ', $selectedQuestions);
+//        log_message('error', $selectedQuestionsString);
+//
+//        $this->db->limit($ujian->jumlah_soal);
+//        return $this->db->get()->result();
+//    }
 
     public function ambilSoal($pc_urut_soal1, $pc_urut_soal_arr)
     {

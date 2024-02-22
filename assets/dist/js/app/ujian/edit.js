@@ -18,6 +18,9 @@ $(document).ready(function () {
         e.preventDefault();
         e.stopImmediatePropagation();
 
+        let btn = $('#submit');
+        btn.attr('disabled', 'disabled').text('Process...');
+
         $.ajax({
             url: $(this).attr('action'),
             data: $(this).serialize(),
